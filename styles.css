@@ -171,6 +171,20 @@ body {
   color: var(--text);
 }
 
+/* Confetti */
+.confetti {
+  position: fixed;
+  inset: 0;
+  z-index: 999;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.confetti__piece {
+  position: absolute;
+  will-change: transform, opacity;
+}
+
 /* Footer */
 .app__footer {
   display: flex;

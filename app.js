@@ -1,4 +1,6 @@
 const STORAGE_KEY = 'demo.tasks.v1';
+const CONFETTI_COUNT = 28;
+const CONFETTI_COLORS = ['#2563eb', '#c85a3c', '#f5c451', '#3fa96b', '#8b5cf6', '#ec4899'];
 const HOUR_MS = 60 * 60 * 1000;
 
 const FACTS = [
@@ -72,7 +74,7 @@ function toElement(task) {
   checkbox.className = 'item__checkbox';
   checkbox.checked = task.done;
   checkbox.id = `task-${task.id}`;
-  checkbox.addEventListener('change', () => toggle(task.id));
+  checkbox.addEventListener('change', () => toggle(task.id, checkbox));
 
   const label = document.createElement('label');
   label.className = 'item__label';
@@ -96,10 +98,16 @@ function add(text) {
   commit();
 }
 
-function toggle(id) {
+function toggle(id, origin) {
   const task = tasks.find((t) => t.id === id);
-  if (task) task.done = !task.done;
+  if (!task) return;
+
+  task.done = !task.done;
+
+  // Capture the origin before commit() re-renders the list out from under it.
+  const rect = task.done && origin ? origin.getBoundingClientRect() : null;
   commit();
+  if (rect) burst(rect);
 }
 
 function destroy(id) {
@@ -110,6 +118,70 @@ function destroy(id) {
 function commit() {
   save();
   render();
+}
+
+/* Confetti */
+
+function burst(rect) {
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+  const layer = confettiLayer();
+  const x = rect.left + rect.width / 2;
+  const y = rect.top + rect.height / 2;
+
+  for (let i = 0; i < CONFETTI_COUNT; i++) {
+    layer.append(piece(x, y));
+  }
+}
+
+function confettiLayer() {
+  let layer = document.querySelector('.confetti');
+  if (!layer) {
+    layer = document.createElement('div');
+    layer.className = 'confetti';
+    layer.setAttribute('aria-hidden', 'true');
+    document.body.append(layer);
+  }
+  return layer;
+}
+
+function piece(x, y) {
+  const el = document.createElement('span');
+  el.className = 'confetti__piece';
+  el.style.left = `${x}px`;
+  el.style.top = `${y}px`;
+  el.style.width = `${between(5, 9)}px`;
+  el.style.height = `${between(7, 13)}px`;
+  el.style.background = CONFETTI_COLORS[Math.floor(Math.random() * CONFETTI_COLORS.length)];
+  if (Math.random() < 0.35) el.style.borderRadius = '50%';
+
+  // Mostly upward, fanning out to either side.
+  const angle = -Math.PI / 2 + (Math.random() - 0.5) * 1.7;
+  const distance = between(90, 230);
+
+  const animation = el.animate(
+    arc(Math.cos(angle) * distance, Math.sin(angle) * distance, between(380, 660), between(-540, 540)),
+    { duration: between(900, 1500), easing: 'linear', fill: 'forwards' },
+  );
+  animation.addEventListener('finish', () => el.remove());
+
+  return el;
+}
+
+function arc(dx, dy, drop, spin) {
+  const steps = 14;
+  return Array.from({ length: steps + 1 }, (_, step) => {
+    const t = step / steps;
+    return {
+      offset: t,
+      transform: `translate(-50%, -50%) translate(${dx * t}px, ${dy * t + drop * t * t}px) rotate(${spin * t}deg)`,
+      opacity: t < 0.65 ? 1 : 1 - (t - 0.65) / 0.35,
+    };
+  });
+}
+
+function between(min, max) {
+  return min + Math.random() * (max - min);
 }
 
 function renderFact() {
