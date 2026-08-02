@@ -26,15 +26,24 @@
 body {
   margin: 0;
   padding: 3rem 1.25rem;
-  background: var(--bg);
+  background-color: var(--bg);
+  background-image: url("images/tile.jpg");
+  background-repeat: repeat;
+  background-size: 96px 96px;
   color: var(--text);
   font: 16px/1.5 ui-sans-serif, -apple-system, "Segoe UI", system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
 }
 
+/* Opaque panel so content stays legible over the tiled background. */
 .app {
   max-width: 34rem;
   margin: 0 auto;
+  padding: 1.5rem;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--surface);
+  box-shadow: 0 8px 30px rgb(0 0 0 / 0.18);
 }
 
 .app__header {
