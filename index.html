@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Demo — Tasks</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main class="app">
+    <header class="app__header">
+      <h1>Tasks</h1>
+      <p class="app__subtitle" id="summary">Nothing yet</p>
+    </header>
+
+    <form class="composer" id="composer" autocomplete="off">
+      <input
+        class="composer__input"
+        id="input"
+        type="text"
+        placeholder="What needs doing?"
+        maxlength="200"
+        aria-label="New task"
+      >
+      <button class="composer__button" type="submit">Add</button>
+    </form>
+
+    <ul class="list" id="list"></ul>
+
+    <footer class="app__footer">
+      <div class="filters" role="group" aria-label="Filter tasks">
+        <button class="filters__button" data-filter="all">All</button>
+        <button class="filters__button" data-filter="active">Active</button>
+        <button class="filters__button" data-filter="done">Done</button>
+      </div>
+      <button class="clear" id="clear" type="button">Clear completed</button>
+    </footer>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>
