@@ -1,10 +1,27 @@
 const STORAGE_KEY = 'demo.tasks.v1';
+const HOUR_MS = 60 * 60 * 1000;
+
+const FACTS = [
+  'Honey never spoils — archaeologists have found 3,000-year-old honey that\'s still edible.',
+  'Octopuses have three hearts, and two of them stop beating when they swim.',
+  'A group of flamingos is called a "flamboyance."',
+  'Bananas are berries, but strawberries aren\'t.',
+  'The Eiffel Tower grows about 6 inches taller in summer due to heat expansion.',
+  'Wombat poop is cube-shaped.',
+  'Sharks existed before trees.',
+  'A day on Venus is longer than a year on Venus.',
+  'Sea otters hold hands while sleeping so they don\'t drift apart.',
+  'The shortest war in history lasted 38 minutes.',
+  'There are more possible chess games than atoms in the observable universe.',
+  'Butterflies taste with their feet.',
+];
 
 const els = {
   composer: document.getElementById('composer'),
   input: document.getElementById('input'),
   list: document.getElementById('list'),
   summary: document.getElementById('summary'),
+  fact: document.getElementById('fact'),
   clear: document.getElementById('clear'),
   filters: document.querySelectorAll('.filters__button'),
 };
@@ -95,6 +112,11 @@ function commit() {
   render();
 }
 
+function renderFact() {
+  const hourIndex = Math.floor(Date.now() / HOUR_MS);
+  els.fact.textContent = `Did you know? ${FACTS[hourIndex % FACTS.length]}`;
+}
+
 els.composer.addEventListener('submit', (event) => {
   event.preventDefault();
   const text = els.input.value.trim();
@@ -117,3 +139,5 @@ els.filters.forEach((button) => {
 });
 
 render();
+renderFact();
+setInterval(renderFact, 60 * 1000);
