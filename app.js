@@ -1,4 +1,5 @@
 const STORAGE_KEY = 'demo.tasks.v1';
+const UNDO_MS = 7000;
 const CONFETTI_COUNT = 28;
 const CONFETTI_COLORS = ['#2563eb', '#c85a3c', '#f5c451', '#3fa96b', '#8b5cf6', '#ec4899'];
 const HOUR_MS = 60 * 60 * 1000;
@@ -24,6 +25,9 @@ const els = {
   list: document.getElementById('list'),
   summary: document.getElementById('summary'),
   fact: document.getElementById('fact'),
+  toast: document.getElementById('toast'),
+  toastMessage: document.getElementById('toast-message'),
+  undo: document.getElementById('undo'),
   clear: document.getElementById('clear'),
   filters: document.querySelectorAll('.filters__button'),
 };
@@ -111,6 +115,10 @@ function toggle(id, origin) {
 }
 
 function destroy(id) {
+  const task = tasks.find((t) => t.id === id);
+  if (!task) return;
+
+  stage(`Deleted "${clip(task.text)}"`);
   tasks = tasks.filter((t) => t.id !== id);
   commit();
 }
@@ -118,6 +126,39 @@ function destroy(id) {
 function commit() {
   save();
   render();
+}
+
+/* Undo */
+
+let undoSnapshot = null;
+let undoTimer = null;
+
+// Snapshot before the caller mutates `tasks`, so undo restores order too.
+function stage(message) {
+  undoSnapshot = tasks.map((task) => ({ ...task }));
+
+  els.toastMessage.textContent = message;
+  els.toast.hidden = false;
+
+  clearTimeout(undoTimer);
+  undoTimer = setTimeout(dismiss, UNDO_MS);
+}
+
+function undo() {
+  if (!undoSnapshot) return;
+  tasks = undoSnapshot;
+  dismiss();
+  commit();
+}
+
+function dismiss() {
+  clearTimeout(undoTimer);
+  undoSnapshot = null;
+  els.toast.hidden = true;
+}
+
+function clip(text) {
+  return text.length > 32 ? `${text.slice(0, 32)}…` : text;
 }
 
 /* Confetti */
@@ -199,8 +240,24 @@ els.composer.addEventListener('submit', (event) => {
 });
 
 els.clear.addEventListener('click', () => {
+  const count = tasks.filter((t) => t.done).length;
+  if (!count) return;
+
+  stage(`Cleared ${count} completed ${count === 1 ? 'task' : 'tasks'}`);
   tasks = tasks.filter((t) => !t.done);
   commit();
+});
+
+els.undo.addEventListener('click', undo);
+
+document.addEventListener('keydown', (event) => {
+  // Leave the composer's own text undo alone.
+  if (event.target === els.input) return;
+
+  if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'z' && undoSnapshot) {
+    event.preventDefault();
+    undo();
+  }
 });
 
 els.filters.forEach((button) => {
