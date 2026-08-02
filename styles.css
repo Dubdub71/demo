@@ -41,6 +41,18 @@ body {
   margin-bottom: 1.5rem;
 }
 
+.app__photo {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: 22rem;
+  margin-bottom: 1rem;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  object-fit: cover;
+  object-position: center 20%;
+}
+
 .app__header h1 {
   margin: 0;
   font-size: 1.75rem;
