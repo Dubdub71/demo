@@ -80,7 +80,7 @@ body {
   padding: 0.7rem 1.1rem;
   border: 0;
   border-radius: var(--radius);
-  background: var(--accent);
+  background: #2563eb;
   color: #fff;
   font: inherit;
   font-weight: 600;
